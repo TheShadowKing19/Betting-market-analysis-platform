@@ -1,0 +1,39 @@
+div_urls:
+  england:
+    premier_league: 'E0'
+    championship: 'E1'
+
+  scotland:
+    premier_league: 'SC0'
+    division_1: 'SC1'
+
+  germany:
+    bundesliga_1: 'D1'
+    bundesliga_2: 'D2'
+
+  italy:
+    serie_a: 'I1'
+    serie_b: 'I2'
+
+  spain:
+    li_liga_primera: 'SP1'
+    li_liga_segunda: 'SP2'
+
+  france:
+    le_championnat: 'F1'
+    division_2: 'F2'
+
+  netherlands:
+    eredivisie: 'N1'
+
+  belgium:
+    jupiler_league: 'B1'
+
+  portugal:
+    liga_I: 'P1'
+
+  turkey:
+    futbol_ligi_1: 'T1'
+
+  greece:
+    ethiniki_katigoria: 'G1'

@@ -1,5 +1,10 @@
 import requests
 import yaml
+import pandas as pd
+import os
+from tqdm import tqdm
+import datetime
+
 
 try:
     config = yaml.load(open('config.yaml'), Loader=yaml.FullLoader)
@@ -7,70 +12,62 @@ except FileNotFoundError:
     print('config.yaml not found')
     exit(1)
 
-# leagues_urls = {
-#     'England': 'https://www.football-data.co.uk/mmz4281/'
-# }
-#
-# # Tylko pierwsze 2
-# england_divs_urls = {
-#     'Premier League': 'E0',
-#     'Championship': 'E1',
-# }
-#
-# scotland_divs_urls = {
-#     'Premier League': 'SC0',
-#     'Division 1': 'SC1',
-# }
-#
-# germany_divs_urls = {
-#     'Bundesliga 1': 'D1',
-#     'Bundesliga 2': 'D2',
-# }
-#
-# italy_divs_urls = {
-#     'Serie A': 'I1',
-#     'Serie B': 'I2',
-# }
-#
-# spain_divs_urls = {
-#     'La Liga Primera': 'SP1',
-#     'La Liga Segunda': 'SP2',
-# }
-#
-# france_divs_urls = {
-#     'Le Championnat': 'F1',
-#     'Division 2': 'F2',
-# }
-#
-# netherlands_divs_urls = {
-#     'Eredivisie': 'N1',
-# }
-#
-# belgium_divs_urls = {
-#     'Jupiler League': 'B1',
-# }
-#
-# portugal_divs_urls = {
-#     'Liga I': 'P1',
-# }
-#
-# turkey_divs_urls = {
-#     'Futbol Ligi 1': 'T1',
-# }
-#
-# greece_divs_urls = {
-#     'Ethniki Katigoria': 'G1',
-# }
+
+def gather_seasons() -> list[str]:
+    """
+    Prepares a list of seasons to gather data from, counting from the current season to 10 seasons back.
+
+    Returns:
+        List of seasons in the format 'YYYY' e.g. ['2122', '2223', '2324', ...]
+
+    """
+    seasons = []
+    current_year = datetime.datetime.today().strftime('%y')
+    current_season = f'{current_year}{int(current_year) + 1}'
+    seasons.append(current_season)
+    for _ in range(9):
+        current_season = f'{int(current_season[:2]) - 1}{int(current_season[2:]) - 1}'
+        seasons.append(current_season)
+    return seasons
 
 
+def gather_data() -> None:
+    """
+    Gathers data for every country, division and season from football-data.co.uk and saves it to the "data" folder.
 
-def get_main_csv():
-    url = 'https://www.football-data.co.uk/mmz4281/2324/Latest_Results.csv'
-    r = requests.get(url, allow_redirects=True)
+    """
+    if not os.path.exists('data'):
+        os.mkdir('data')
 
-    open('main_csv.csv', 'wb').write(r.content)
+    seasons = gather_seasons()
+    print("Gathering data...")
+    countries = config['div_urls'].keys()
+    for country in tqdm(countries):
+        for div in config['div_urls'][country].values():
+            for season in seasons:
+
+                url = f'https://www.football-data.co.uk/mmz4281/{season}/{div}.csv'
+                r = requests.get(url, allow_redirects=True)
+
+                open(f'data/{country}_{div}_{season}.csv', 'wb').write(r.content)
+
+
+def merge_data() -> None:
+    """
+    Merges all the data from the "data" folder into a single csv file.
+
+    """
+    files = os.listdir('data')
+    df = pd.DataFrame()
+    print("Merging data...")
+    for file in tqdm(files):
+        df = pd.concat([df, pd.read_csv(f'data/{file}', encoding='windows-1252')],
+                       axis=0,
+                       ignore_index=True)
+    df.to_csv('merged_data.csv', index=False)
+    pass
 
 
 if __name__ == '__main__':
-    print(config)
+    merge_data()
     pass

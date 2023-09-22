@@ -50,6 +50,10 @@ def gather_data() -> None:
                 r = requests.get(url, allow_redirects=True)
 
                 open(f'data/{country}_{div}_{season}.csv', 'wb').write(r.content)
+                df = pd.read_csv(f'data/{country}_{div}_{season}.csv', encoding='windows-1252')
+                season_column = [season] * len(df.index)
+                df['Season'] = season_column
+                df.to_csv(f'data/{country}_{div}_{season}.csv', sep=',', index=False)
 
 
 def merge_data() -> None:
@@ -59,7 +63,7 @@ def merge_data() -> None:
     """
     files = os.listdir('data')
     df = pd.DataFrame()
-    print("Merging data...")
+    print("\nMerging data...")
     for file in tqdm(files):
         df = pd.concat([df, pd.read_csv(f'data/{file}', encoding='windows-1252')],
                        axis=0,
@@ -68,6 +72,21 @@ def merge_data() -> None:
     pass
 
 
+def clean_data():
+    print("\nCleaning data...")
+    df = pd.read_csv('merged_data.csv', encoding='windows-1252', low_memory=False)
+    try:
+        df.drop('Unnamed: 105', axis=1, inplace=True)
+    except KeyError:
+        print("No Unnamed: 105 column found")
+    df.to_csv('merged_data_clean.csv', index=False)
+    pass
+
+
 if __name__ == '__main__':
-    merge_data()
+    # gather_seasons()
+    # gather_data()
+    # merge_data()
+    clean_data()
+    print("Done!")
     pass

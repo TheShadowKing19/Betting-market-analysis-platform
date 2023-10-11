@@ -4,6 +4,7 @@ import pandas as pd
 import os
 from tqdm import tqdm
 import datetime
+from bs4 import BeautifulSoup
 
 
 try:
@@ -40,11 +41,12 @@ def gather_data() -> None:
         os.mkdir('data')
 
     seasons = gather_seasons()
+    seasons.reverse()
     print("Gathering data...")
     countries = config['div_urls'].keys()
     for country in tqdm(countries):
         for div in config['div_urls'][country].values():
-            for season in seasons:
+            for idx, season in enumerate(seasons):
 
                 url = f'https://www.football-data.co.uk/mmz4281/{season}/{div}.csv'
                 r = requests.get(url, allow_redirects=True)
@@ -52,8 +54,14 @@ def gather_data() -> None:
                 open(f'data/{country}_{div}_{season}.csv', 'wb').write(r.content)
                 df = pd.read_csv(f'data/{country}_{div}_{season}.csv', encoding='windows-1252')
                 season_column = [season] * len(df.index)
+                season_idx_column = [idx + 1] * len(df.index)
                 df['Season'] = season_column
+                df['Season_idx'] = season_idx_column
                 df.to_csv(f'data/{country}_{div}_{season}.csv', sep=',', index=False)
+
+
+def _get_current_team_value(season: str):
+    pass
 
 
 def merge_data() -> None:
@@ -84,9 +92,9 @@ def clean_data():
 
 
 if __name__ == '__main__':
-    # gather_seasons()
-    # gather_data()
-    # merge_data()
+    gather_seasons()
+    gather_data()
+    merge_data()
     clean_data()
     print("Done!")
     pass

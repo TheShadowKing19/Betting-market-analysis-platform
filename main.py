@@ -4,6 +4,7 @@ import pandas as pd
 import os
 from tqdm import tqdm
 import datetime
+import numpy as np
 from bs4 import BeautifulSoup
 
 
@@ -80,13 +81,52 @@ def merge_data() -> None:
     pass
 
 
-def clean_data():
-    print("\nCleaning data...")
+def transform_data():
+    print("\nTransforming data...")
     df = pd.read_csv('merged_data.csv', encoding='windows-1252', low_memory=False)
     try:
         df.drop('Unnamed: 105', axis=1, inplace=True)
     except KeyError:
         print("No Unnamed: 105 column found")
+    b365_loc: int = df.columns.get_loc('B365A')
+    df.insert(loc=b365_loc+1, column='B365_favour', value='')
+    for index, row in df.iterrows():
+        match row['FTR']:
+            case 'H':
+                df.loc[index, 'FTR'] = row['HomeTeam']
+            case 'A':
+                df.loc[index, 'FTR'] = row['AwayTeam']
+            case 'D':
+                df.loc[index, 'FTR'] = 'Draw'
+            case _:
+                df.loc[index, 'FTR'] = np.nan
+        match row['HTR']:
+            case 'H':
+                df.loc[index, 'HTR'] = row['HomeTeam']
+            case 'A':
+                df.loc[index, 'HTR'] = row['AwayTeam']
+            case 'D':
+                df.loc[index, 'HTR'] = 'Draw'
+            case _:
+                df.loc[index, 'HTR'] = np.nan
+        match pd.to_numeric(row[['B365H', 'B365D', 'B365A']]).idxmin():
+            case 'B365H':
+                df.loc[index, 'B365_favour'] = row['HomeTeam']
+            case 'B365D':
+                df.loc[index, 'B365_favour'] = 'Draw'
+            case 'B365A':
+                df.loc[index, 'B365_favour'] = row['AwayTeam']
+            case _:
+                df.loc[index, 'B365_favour'] = np.nan
+
+    df.rename(columns={
+        'FTHG': 'fulltime_home_goals',
+        'FTAG': 'fulltime_away_goals',
+        'FTR': 'fulltime_match_result',
+        'HTHG': 'halftime_home_goals',
+        'HTAG': 'halftime_away_goals',
+        'HTR': 'halftime_match_result',
+    }, inplace=True)
     df.to_csv('merged_data_clean.csv', index=False)
     pass
 
@@ -95,6 +135,6 @@ if __name__ == '__main__':
     gather_seasons()
     gather_data()
     merge_data()
-    clean_data()
+    transform_data()
     print("Done!")
     pass

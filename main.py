@@ -88,7 +88,24 @@ def transform_data():
     except KeyError:
         print("No Unnamed: 105 column found")
     b365_loc: int = df.columns.get_loc('B365A')
+
     df.insert(loc=b365_loc+1, column='B365_favour', value='')
+    df.insert(loc=b365_loc+1, column='B365_surprised', value=0)
+    df.insert(loc=b365_loc+6, column='bet_and_win_favour', value='')
+    df.insert(loc=b365_loc+6, column='bet_and_win_surprised', value=0)
+    df.insert(loc=b365_loc+11, column='interwetten_favour', value='')
+    df.insert(loc=b365_loc+11, column='interwetten_surprised', value=0)
+    df.insert(loc=b365_loc+16, column='ladbrokes_favour', value="")
+    df.insert(loc=b365_loc+16, column='ladbrokes_surprised', value=0)
+    df.insert(loc=b365_loc+21, column='pinnacle_favour', value='')
+    df.insert(loc=b365_loc+21, column='pinnacle_surprised', value=0)
+    df.insert(loc=b365_loc+26, column='william_hill_favour', value='')
+    df.insert(loc=b365_loc+26, column='william_hill_surprised', value=0)
+    df.insert(loc=b365_loc+31, column='stan_james_favour', value='')
+    df.insert(loc=b365_loc+31, column='stan_james_surprised', value=0)
+    df.insert(loc=b365_loc+36, column='vc_bet_favour', value='')
+    df.insert(loc=b365_loc+36, column='vc_bet_surprised', value=0)
+
     for index, row in df.iterrows():
         match row['FTR']:
             case 'H':
@@ -99,6 +116,7 @@ def transform_data():
                 df.loc[index, 'FTR'] = 'Draw'
             case _:
                 df.loc[index, 'FTR'] = np.nan
+
         match row['HTR']:
             case 'H':
                 df.loc[index, 'HTR'] = row['HomeTeam']
@@ -108,6 +126,7 @@ def transform_data():
                 df.loc[index, 'HTR'] = 'Draw'
             case _:
                 df.loc[index, 'HTR'] = np.nan
+
         match pd.to_numeric(row[['B365H', 'B365D', 'B365A']]).idxmin():
             case 'B365H':
                 df.loc[index, 'B365_favour'] = row['HomeTeam']
@@ -117,6 +136,76 @@ def transform_data():
                 df.loc[index, 'B365_favour'] = row['AwayTeam']
             case _:
                 df.loc[index, 'B365_favour'] = np.nan
+
+        match pd.to_numeric(row[['BWH', 'BWD', 'BWA']]).idxmin():
+            case 'BWH':
+                df.loc[index, 'bet_and_win_favour'] = row['HomeTeam']
+            case 'BWD':
+                df.loc[index, 'bet_and_win_favour'] = 'Draw'
+            case 'BWA':
+                df.loc[index, 'bet_and_win_favour'] = row['AwayTeam']
+            case _:
+                df.loc[index, 'bet_and_win_favour'] = np.nan
+
+        match pd.to_numeric(row[['IWH', 'IWD', 'IWA']]).idxmin():
+            case 'IWH':
+                df.loc[index, 'interwetten_favour'] = row['HomeTeam']
+            case 'IWD':
+                df.loc[index, 'interwetten_favour'] = 'Draw'
+            case 'IWA':
+                df.loc[index, 'interwetten_favour'] = row['AwayTeam']
+            case _:
+                df.loc[index, 'interwetten_favour'] = np.nan
+
+        match pd.to_numeric(row[['LBH', 'LBD', 'LBA']]).idxmin():
+            case 'LBH':
+                df.loc[index, 'ladbrokes_favour'] = row['HomeTeam']
+            case 'LBD':
+                df.loc[index, 'ladbrokes_favour'] = 'Draw'
+            case 'LBA':
+                df.loc[index, 'ladbrokes_favour'] = row['AwayTeam']
+            case _:
+                df.loc[index, 'ladbrokes_favour'] = np.nan
+
+        match pd.to_numeric(row[['PSH', 'PSD', 'PSA']]).idxmin():
+            case 'PSH':
+                df.loc[index, 'pinnacle_favour'] = row['HomeTeam']
+            case 'PSD':
+                df.loc[index, 'pinnacle_favour'] = 'Draw'
+            case 'PSA':
+                df.loc[index, 'pinnacle_favour'] = row['AwayTeam']
+            case _:
+                df.loc[index, 'pinnacle_favour'] = np.nan
+
+        match pd.to_numeric(row[['WHH', 'WHD', 'WHA']]).idxmin():
+            case 'WHH':
+                df.loc[index, 'william_hill_favour'] = row['HomeTeam']
+            case 'WHD':
+                df.loc[index, 'william_hill_favour'] = 'Draw'
+            case 'WHA':
+                df.loc[index, 'william_hill_favour'] = row['AwayTeam']
+            case _:
+                df.loc[index, 'william_hill_favour'] = np.nan
+
+        match pd.to_numeric(row[['SJH', 'SJD', 'SJA']]).idxmin():
+            case 'SJH':
+                df.loc[index, 'stan_james_favour'] = row['HomeTeam']
+            case 'SJD':
+                df.loc[index, 'stan_james_favour'] = 'Draw'
+            case 'SJA':
+                df.loc[index, 'stan_james_favour'] = row['AwayTeam']
+            case _:
+                df.loc[index, 'stan_james_favour'] = np.nan
+
+        match pd.to_numeric(row[['VCH', 'VCD', 'VCA']]).idxmin():
+            case 'VCH':
+                df.loc[index, 'vc_bet_favour'] = row['HomeTeam']
+            case 'VCD':
+                df.loc[index, 'vc_bet_favour'] = 'Draw'
+            case 'VCA':
+                df.loc[index, 'vc_bet_favour'] = row['AwayTeam']
+            case _:
+                df.loc[index, 'vc_bet_favour'] = np.nan
 
     df.rename(columns={
         'FTHG': 'fulltime_home_goals',
@@ -138,6 +227,15 @@ def transform_data():
         'HST': 'home_team_shots_on_target',
         'AST': 'away_team_shots_on_target'
     }, inplace=True)
+
+    df['B365_surprised'] = df.apply(lambda x: np.nan if pd.isna(x['B365_favour']) else (1 if x['B365_favour'] != x['fulltime_match_result'] else 0), axis=1)
+    df['bet_and_win_surprised'] = df.apply(lambda x: np.nan if pd.isna(x['bet_and_win_favour']) else (1 if x['bet_and_win_favour'] != x['fulltime_match_result'] else 0), axis=1)
+    df['interwetten_surprised'] = df.apply(lambda x: np.nan if pd.isna(x['interwetten_favour']) else (1 if x['interwetten_favour'] != x['fulltime_match_result'] else 0), axis=1)
+    df['ladbrokes_surprised'] = df.apply(lambda x: np.nan if pd.isna(x['ladbrokes_favour']) else (1 if x['ladbrokes_favour'] != x['fulltime_match_result'] else 0), axis=1)
+    df['pinnacle_surprised'] = df.apply(lambda x: np.nan if pd.isna(x['pinnacle_favour']) else (1 if x['pinnacle_favour'] != x['fulltime_match_result'] else 0), axis=1)
+    df['william_hill_surprised'] = df.apply(lambda x: np.nan if pd.isna(x['william_hill_favour']) else (1 if x['william_hill_favour'] != x['fulltime_match_result'] else 0), axis=1)
+    df['stan_james_surprised'] = df.apply(lambda x: np.nan if pd.isna(x['stan_james_favour']) else (1 if x['stan_james_favour'] != x['fulltime_match_result'] else 0), axis=1)
+    df['vc_bet_surprised'] = df.apply(lambda x: np.nan if pd.isna(x['vc_bet_favour']) else (1 if x['vc_bet_favour'] != x['fulltime_match_result'] else 0), axis=1)
     _create_id(df)
     df.to_csv('merged_data_clean.csv', index=False)
     pass

@@ -106,14 +106,26 @@ def transform_data():
     df.insert(loc=b365_loc+36, column='vc_bet_favour', value='')
     df.insert(loc=b365_loc+36, column='vc_bet_surprised', value=0)
 
+    b365_loc: int = df.columns.get_loc('B365A')
+    df.insert(loc=b365_loc-2, column='guest_won', value=0)
+    df.insert(loc=b365_loc-2, column='guest_lost', value=0)
+    df.insert(loc=b365_loc-2, column='draw', value=0)
+    df.insert(loc=b365_loc-2, column='home_won', value=0)
+    df.insert(loc=b365_loc-2, column='home_lost', value=0)
+
     for index, row in df.iterrows():
         match row['FTR']:
             case 'H':
                 df.loc[index, 'FTR'] = row['HomeTeam']
+                df.loc[index, 'guest_lost'] = 1
+                df.loc[index, 'home_won'] = 1
             case 'A':
                 df.loc[index, 'FTR'] = row['AwayTeam']
+                df.loc[index, 'guest_won'] = 1
+                df.loc[index, 'home_lost'] = 1
             case 'D':
                 df.loc[index, 'FTR'] = 'Draw'
+                df.loc[index, 'draw'] = 1
             case _:
                 df.loc[index, 'FTR'] = np.nan
 

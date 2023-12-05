@@ -113,7 +113,7 @@ def transform_data():
     df.insert(loc=b365_loc-2, column='home_won', value=0)
     df.insert(loc=b365_loc-2, column='home_lost', value=0)
 
-    for index, row in df.iterrows():
+    for index, row in tqdm(df.iterrows(), total=len(df.index)):
         match row['FTR']:
             case 'H':
                 df.loc[index, 'FTR'] = row['HomeTeam']
@@ -219,6 +219,159 @@ def transform_data():
             case _:
                 df.loc[index, 'vc_bet_favour'] = np.nan
 
+        if pd.isna(df.loc[index, 'B365_favour']):
+            df.loc[index, 'B365_surprised'] = np.nan
+        elif df.loc[index, 'B365_favour'] != df.loc[index, 'FTR']:
+            if df.loc[index, 'home_won'] == 1:
+                if df.loc[index, 'B365_favour'] == row['AwayTeam']:
+                    df.loc[index, 'B365_surprised'] = round(row['B365H'] - row['B365A'], 2)
+                else:
+                    df.loc[index, 'B365_surprised'] = round(row['B365H'] - row['B365D'], 2)
+            elif df.loc[index, 'draw'] == 1:
+                if df.loc[index, 'B365_favour'] == row['HomeTeam']:
+                    df.loc[index, 'B365_surprised'] = round(row['B365D'] - row['B365H'], 2)
+                else:
+                    df.loc[index, 'B365_surprised'] = round(row['B365D'] - row['B365A'], 2)
+            elif df.loc[index, 'guest_won'] == 1:
+                if df.loc[index, 'B365_favour'] == row['HomeTeam']:
+                    df.loc[index, 'B365_surprised'] = round(row['B365A'] - row['B365H'], 2)
+                else:
+                    df.loc[index, 'B365_surprised'] = round(row['B365A'] - row['B365D'], 2)
+
+        if pd.isna(df.loc[index, 'bet_and_win_favour']):
+            df.loc[index, 'bet_and_win_surprised'] = np.nan
+        elif df.loc[index, 'bet_and_win_favour'] != df.loc[index, 'FTR']:
+            if df.loc[index, 'home_won'] == 1:
+                if df.loc[index, 'bet_and_win_favour'] == row['AwayTeam']:
+                    df.loc[index, 'bet_and_win_surprised'] = round(row['BWH'] - row['BWA'], 2)
+                else:
+                    df.loc[index, 'bet_and_win_surprised'] = round(row['BWH'] - row['BWD'], 2)
+            elif df.loc[index, 'draw'] == 1:
+                if df.loc[index, 'bet_and_win_favour'] == row['HomeTeam']:
+                    df.loc[index, 'bet_and_win_surprised'] = round(row['BWD'] - row['BWH'], 2)
+                else:
+                    df.loc[index, 'bet_and_win_surprised'] = round(row['BWD'] - row['BWA'], 2)
+            elif df.loc[index, 'guest_won'] == 1:
+                if df.loc[index, 'bet_and_win_favour'] == row['HomeTeam']:
+                    df.loc[index, 'bet_and_win_surprised'] = round(row['BWA'] - row['BWH'], 2)
+                else:
+                    df.loc[index, 'bet_and_win_surprised'] = round(row['BWA'] - row['BWD'], 2)
+
+        if pd.isna(df.loc[index, 'interwetten_favour']):
+            df.loc[index, 'interwetten_surprised'] = np.nan
+        elif df.loc[index, 'interwetten_favour'] != df.loc[index, 'FTR']:
+            if df.loc[index, 'home_won'] == 1:
+                if df.loc[index, 'interwetten_favour'] == row['AwayTeam']:
+                    df.loc[index, 'interwetten_surprised'] = round(row['IWH'] - row['IWA'], 2)
+                else:
+                    df.loc[index, 'interwetten_surprised'] = round(row['IWH'] - row['IWD'], 2)
+            elif df.loc[index, 'draw'] == 1:
+                if df.loc[index, 'interwetten_favour'] == row['HomeTeam']:
+                    df.loc[index, 'interwetten_surprised'] = round(row['IWD'] - row['IWH'], 2)
+                else:
+                    df.loc[index, 'interwetten_surprised'] = round(row['IWD'] - row['IWA'], 2)
+            elif df.loc[index, 'guest_won'] == 1:
+                if df.loc[index, 'interwetten_favour'] == row['HomeTeam']:
+                    df.loc[index, 'interwetten_surprised'] = round(row['IWA'] - row['IWH'], 2)
+                else:
+                    df.loc[index, 'interwetten_surprised'] = round(row['IWA'] - row['IWD'], 2)
+
+        if pd.isna(df.loc[index, 'ladbrokes_favour']):
+            df.loc[index, 'ladbrokes_surprised'] = np.nan
+        elif df.loc[index, 'ladbrokes_favour'] != df.loc[index, 'FTR']:
+            if df.loc[index, 'home_won'] == 1:
+                if df.loc[index, 'ladbrokes_favour'] == row['AwayTeam']:
+                    df.loc[index, 'ladbrokes_surprised'] = round(row['LBH'] - row['LBA'], 2)
+                else:
+                    df.loc[index, 'ladbrokes_surprised'] = round(row['LBH'] - row['LBD'], 2)
+            elif df.loc[index, 'draw'] == 1:
+                if df.loc[index, 'ladbrokes_favour'] == row['HomeTeam']:
+                    df.loc[index, 'ladbrokes_surprised'] = round(row['LBD'] - row['LBH'], 2)
+                else:
+                    df.loc[index, 'ladbrokes_surprised'] = round(row['LBD'] - row['LBA'], 2)
+            elif df.loc[index, 'guest_won'] == 1:
+                if df.loc[index, 'ladbrokes_favour'] == row['HomeTeam']:
+                    df.loc[index, 'ladbrokes_surprised'] = round(row['LBA'] - row['LBH'], 2)
+                else:
+                    df.loc[index, 'ladbrokes_surprised'] = round(row['LBA'] - row['LBD'], 2)
+
+        if pd.isna(df.loc[index, 'pinnacle_favour']):
+            df.loc[index, 'pinnacle_surprised'] = np.nan
+        elif df.loc[index, 'pinnacle_favour'] != df.loc[index, 'FTR']:
+            if df.loc[index, 'home_won'] == 1:
+                if df.loc[index, 'pinnacle_favour'] == row['AwayTeam']:
+                    df.loc[index, 'pinnacle_surprised'] = round(row['PSH'] - row['PSA'], 2)
+                else:
+                    df.loc[index, 'pinnacle_surprised'] = round(row['PSH'] - row['PSD'], 2)
+            elif df.loc[index, 'draw'] == 1:
+                if df.loc[index, 'pinnacle_favour'] == row['HomeTeam']:
+                    df.loc[index, 'pinnacle_surprised'] = round(row['PSD'] - row['PSH'], 2)
+                else:
+                    df.loc[index, 'pinnacle_surprised'] = round(row['PSD'] - row['PSA'], 2)
+            elif df.loc[index, 'guest_won'] == 1:
+                if df.loc[index, 'pinnacle_favour'] == row['HomeTeam']:
+                    df.loc[index, 'pinnacle_surprised'] = round(row['PSA'] - row['PSH'], 2)
+                else:
+                    df.loc[index, 'pinnacle_surprised'] = round(row['PSA'] - row['PSD'], 2)
+
+        if pd.isna(df.loc[index, 'william_hill_favour']):
+            df.loc[index, 'william_hill_surprised'] = np.nan
+        elif df.loc[index, 'william_hill_favour'] != df.loc[index, 'FTR']:
+            if df.loc[index, 'home_won'] == 1:
+                if df.loc[index, 'william_hill_favour'] == row['AwayTeam']:
+                    df.loc[index, 'william_hill_surprised'] = round(row['WHH'] - row['WHA'], 2)
+                else:
+                    df.loc[index, 'william_hill_surprised'] = round(row['WHH'] - row['WHD'], 2)
+            elif df.loc[index, 'draw'] == 1:
+                if df.loc[index, 'william_hill_favour'] == row['HomeTeam']:
+                    df.loc[index, 'william_hill_surprised'] = round(row['WHD'] - row['WHH'], 2)
+                else:
+                    df.loc[index, 'william_hill_surprised'] = round(row['WHD'] - row['WHA'], 2)
+            elif df.loc[index, 'guest_won'] == 1:
+                if df.loc[index, 'william_hill_favour'] == row['HomeTeam']:
+                    df.loc[index, 'william_hill_surprised'] = round(row['WHA'] - row['WHH'], 2)
+                else:
+                    df.loc[index, 'william_hill_surprised'] = round(row['WHA'] - row['WHD'], 2)
+
+        if pd.isna(df.loc[index, 'stan_james_favour']):
+            df.loc[index, 'stan_james_surprised'] = np.nan
+        elif df.loc[index, 'stan_james_favour'] != df.loc[index, 'FTR']:
+            if df.loc[index, 'home_won'] == 1:
+                if df.loc[index, 'stan_james_favour'] == row['AwayTeam']:
+                    df.loc[index, 'stan_james_surprised'] = round(row['SJH'] - row['SJA'], 2)
+                else:
+                    df.loc[index, 'stan_james_surprised'] = round(row['SJH'] - row['SJD'], 2)
+            elif df.loc[index, 'draw'] == 1:
+                if df.loc[index, 'stan_james_favour'] == row['HomeTeam']:
+                    df.loc[index, 'stan_james_surprised'] = round(row['SJD'] - row['SJH'], 2)
+                else:
+                    df.loc[index, 'stan_james_surprised'] = round(row['SJD'] - row['SJA'], 2)
+            elif df.loc[index, 'guest_won'] == 1:
+                if df.loc[index, 'stan_james_favour'] == row['HomeTeam']:
+                    df.loc[index, 'stan_james_surprised'] = round(row['SJA'] - row['SJH'], 2)
+                else:
+                    df.loc[index, 'stan_james_surprised'] = round(row['SJA'] - row['SJD'], 2)
+
+        if pd.isna(df.loc[index, 'vc_bet_favour']):
+            df.loc[index, 'vc_bet_surprised'] = np.nan
+        elif df.loc[index, 'vc_bet_favour'] != df.loc[index, 'FTR']:
+            if df.loc[index, 'home_won'] == 1:
+                if df.loc[index, 'vc_bet_favour'] == row['AwayTeam']:
+                    df.loc[index, 'vc_bet_surprised'] = round(row['VCH'] - row['VCA'], 2)
+                else:
+                    df.loc[index, 'vc_bet_surprised'] = round(row['VCH'] - row['VCD'], 2)
+            elif df.loc[index, 'draw'] == 1:
+                if df.loc[index, 'vc_bet_favour'] == row['HomeTeam']:
+                    df.loc[index, 'vc_bet_surprised'] = round(row['VCD'] - row['VCH'], 2)
+                else:
+                    df.loc[index, 'vc_bet_surprised'] = round(row['VCD'] - row['VCA'], 2)
+            elif df.loc[index, 'guest_won'] == 1:
+                if df.loc[index, 'vc_bet_favour'] == row['HomeTeam']:
+                    df.loc[index, 'vc_bet_surprised'] = round(row['VCA'] - row['VCH'], 2)
+                else:
+                    df.loc[index, 'vc_bet_surprised'] = round(row['VCA'] - row['VCD'], 2)
+
+
     df.rename(columns={
         'FTHG': 'fulltime_home_goals',
         'FTAG': 'fulltime_away_goals',
@@ -240,20 +393,27 @@ def transform_data():
         'AST': 'away_team_shots_on_target'
     }, inplace=True)
 
-    df['B365_surprised'] = df.apply(lambda x: np.nan if pd.isna(x['B365_favour']) else (1 if x['B365_favour'] != x['fulltime_match_result'] else 0), axis=1)
-    df['bet_and_win_surprised'] = df.apply(lambda x: np.nan if pd.isna(x['bet_and_win_favour']) else (1 if x['bet_and_win_favour'] != x['fulltime_match_result'] else 0), axis=1)
-    df['interwetten_surprised'] = df.apply(lambda x: np.nan if pd.isna(x['interwetten_favour']) else (1 if x['interwetten_favour'] != x['fulltime_match_result'] else 0), axis=1)
-    df['ladbrokes_surprised'] = df.apply(lambda x: np.nan if pd.isna(x['ladbrokes_favour']) else (1 if x['ladbrokes_favour'] != x['fulltime_match_result'] else 0), axis=1)
-    df['pinnacle_surprised'] = df.apply(lambda x: np.nan if pd.isna(x['pinnacle_favour']) else (1 if x['pinnacle_favour'] != x['fulltime_match_result'] else 0), axis=1)
-    df['william_hill_surprised'] = df.apply(lambda x: np.nan if pd.isna(x['william_hill_favour']) else (1 if x['william_hill_favour'] != x['fulltime_match_result'] else 0), axis=1)
-    df['stan_james_surprised'] = df.apply(lambda x: np.nan if pd.isna(x['stan_james_favour']) else (1 if x['stan_james_favour'] != x['fulltime_match_result'] else 0), axis=1)
-    df['vc_bet_surprised'] = df.apply(lambda x: np.nan if pd.isna(x['vc_bet_favour']) else (1 if x['vc_bet_favour'] != x['fulltime_match_result'] else 0), axis=1)
+    columns = ['B365_surprised', 'bet_and_win_surprised', 'interwetten_surprised', 'ladbrokes_surprised',
+               'pinnacle_surprised', 'william_hill_surprised', 'stan_james_surprised', 'vc_bet_surprised']
+
+    for column in columns:
+        df[column] = round((df[column] - df[column].min()) / (df[column].max() - df[column].min()), 2)
+
+    # df['B365_surprised'] = df.apply(lambda x: np.nan if pd.isna(x['B365_favour']) else (1 if x['B365_favour'] != x['fulltime_match_result'] else 0), axis=1)
+    # df['bet_and_win_surprised'] = df.apply(lambda x: np.nan if pd.isna(x['bet_and_win_favour']) else (1 if x['bet_and_win_favour'] != x['fulltime_match_result'] else 0), axis=1)
+    # df['interwetten_surprised'] = df.apply(lambda x: np.nan if pd.isna(x['interwetten_favour']) else (1 if x['interwetten_favour'] != x['fulltime_match_result'] else 0), axis=1)
+    # df['ladbrokes_surprised'] = df.apply(lambda x: np.nan if pd.isna(x['ladbrokes_favour']) else (1 if x['ladbrokes_favour'] != x['fulltime_match_result'] else 0), axis=1)
+    # df['pinnacle_surprised'] = df.apply(lambda x: np.nan if pd.isna(x['pinnacle_favour']) else (1 if x['pinnacle_favour'] != x['fulltime_match_result'] else 0), axis=1)
+    # df['william_hill_surprised'] = df.apply(lambda x: np.nan if pd.isna(x['william_hill_favour']) else (1 if x['william_hill_favour'] != x['fulltime_match_result'] else 0), axis=1)
+    # df['stan_james_surprised'] = df.apply(lambda x: np.nan if pd.isna(x['stan_james_favour']) else (1 if x['stan_james_favour'] != x['fulltime_match_result'] else 0), axis=1)
+    # df['vc_bet_surprised'] = df.apply(lambda x: np.nan if pd.isna(x['vc_bet_favour']) else (1 if x['vc_bet_favour'] != x['fulltime_match_result'] else 0), axis=1)
     _create_id(df)
+    df.dropna(subset=['Div'], inplace=True)
     df.to_csv('merged_data_clean.csv', index=False)
     pass
 
 
-def _create_id(dataframe: pd.DataFrame):
+def _create_id(dataframe: pd.DataFrame) -> None:
     id_column_loc: int = 0
     dataframe.insert(loc=id_column_loc, column='ID', value='')
     dataframe['ID'] = dataframe['HomeTeam'].astype(str) + dataframe['AwayTeam'].astype(str) + dataframe['Date'].astype(str)

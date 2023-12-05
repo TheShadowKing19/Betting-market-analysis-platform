@@ -5,7 +5,7 @@ import os
 from tqdm import tqdm
 import datetime
 import numpy as np
-from bs4 import BeautifulSoup
+from sqlalchemy import create_engine
 import hashlib
 
 
@@ -78,6 +78,12 @@ def merge_data() -> None:
                        ignore_index=True)
     df.to_csv('merged_data.csv', index=False)
     pass
+
+
+def _upload_data(data: pd.DataFrame) -> None:
+    print('\nUploading data...')
+    engine = create_engine('mysql://root:root@localhost:3306/football')
+    data.to_sql(name="data", con=engine, if_exists='replace', index=False)
 
 
 def transform_data():
@@ -409,6 +415,7 @@ def transform_data():
     # df['vc_bet_surprised'] = df.apply(lambda x: np.nan if pd.isna(x['vc_bet_favour']) else (1 if x['vc_bet_favour'] != x['fulltime_match_result'] else 0), axis=1)
     _create_id(df)
     df.dropna(subset=['Div'], inplace=True)
+    _upload_data(df)
     df.to_csv('merged_data_clean.csv', index=False)
     pass
 

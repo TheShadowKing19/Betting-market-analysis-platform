@@ -81,12 +81,24 @@ def merge_data() -> None:
 
 
 def _upload_data(data: pd.DataFrame) -> None:
+    """
+    Uploads data to the database.
+
+    Args:
+        data: Data to be uploaded into the database.
+
+    """
     print('\nUploading data...')
     engine = create_engine('mysql://root:root@localhost:3306/football')
     data.to_sql(name="data", con=engine, if_exists="replace", index=False)
 
 
 def transform_data():
+    """
+    Transforms data, tidying it up and performing operations such as column renaming. Also calculates surprises and
+    favours. Data is then saved to file.
+
+    """
     print("\nTransforming data...")
     df = pd.read_csv('merged_data.csv', encoding='windows-1252', low_memory=False)
     try:
@@ -413,6 +425,14 @@ def transform_data():
 
 
 def _create_id(dataframe: pd.DataFrame) -> None:
+    """
+    Adds two new columns to dataframe: ID and checksum, both of which are hashes of certain columns. This is performed
+    to check for duplicates, which shouldn't happen.
+
+    Args:
+        dataframe: Main dataframe containing all columns.
+
+    """
     id_column_loc: int = 0
     dataframe.insert(loc=id_column_loc, column='ID', value='')
     dataframe['ID'] = dataframe['HomeTeam'].astype(str) + dataframe['AwayTeam'].astype(str) + dataframe['Date'].astype(str)
@@ -423,7 +443,7 @@ def _create_id(dataframe: pd.DataFrame) -> None:
 
 if __name__ == '__main__':
     gather_seasons()
-    # gather_data()
+    gather_data()
     merge_data()
     transform_data()
     print("Done!")

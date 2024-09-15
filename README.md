@@ -7,18 +7,13 @@ Betting Market Analysis Platform is a project I did for my Engineering Thesis. I
 
 ## Usage
 
-```python
-import foobar
-
-# returns 'words'
-foobar.pluralize('word')
-
-# returns 'geese'
-foobar.pluralize('goose')
-
-# returns 'phenomenon'
-foobar.singularize('phenomena')
+### Python script that executes ETL process
+To execute the ETL process of this project, just run `main.py`:
+```console
+foo@bar:~$ python main.py
 ```
+> [!WARNING]
+> Make sure the `config.yaml` file is in the same directory as `main.py`. The script requires this file to function properly.
 
 ## Contributing
 

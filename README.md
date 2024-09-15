@@ -8,9 +8,17 @@ Betting Market Analysis Platform is a project I did for my Engineering Thesis. I
 ## Usage
 
 ### Python script that executes ETL process
+> [!WARNING]
+> This project support only Python in version 3.10.* and 3.11.*
+
+After pulling the project, make sure you have the necessary dependencies by typing in console:
+```console
+foo@bar:~/Betting-market-analysis-platform$ pip install -r requirements.txt
+```
+
 To execute the ETL process of this project, just run `main.py`:
 ```console
-foo@bar:~$ python main.py
+foo@bar:~/Betting-market-analysis-platform$ python main.py
 ```
 > [!WARNING]
 > Make sure the `config.yaml` file is in the same directory as `main.py`. The script requires this file to function properly.

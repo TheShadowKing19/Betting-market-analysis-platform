@@ -23,6 +23,9 @@ foo@bar:~/Betting-market-analysis-platform$ python main.py
 > [!WARNING]
 > Make sure the `config.yaml` file is in the same directory as `main.py`. The script requires this file to function properly.
 
+### Power Bi reports
+Power Bi reports are located in `Report.pbix`. To access them, just open the file in Power Bi Desktop app on your computer.
+
 ## Contributing
 
 This project is completed and doesn't accept any contributing.

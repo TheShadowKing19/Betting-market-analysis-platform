@@ -1,0 +1,6 @@
+requests~=2.31.0
+PyYAML~=6.0
+pandas~=2.2.1
+numpy~=1.23.5
+tqdm~=4.65.0
+SQLAlchemy~=2.0.23

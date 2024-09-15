@@ -24,6 +24,3 @@ foobar.singularize('phenomena')
 
 This project is completed and doesn't accept any contributing.
 
-## License
-
-[MIT](https://choosealicense.com/licenses/mit/)
